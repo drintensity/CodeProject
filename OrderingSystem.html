@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CafeteriaEase school cafeteria ordering system prototype">
+  <title>CafeteriaEase | Ordering System</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" onclick="showScreen('login'); return false;">
+      <span class="brand-mark">CE</span>
+      <span>Cafeteria<span class="brand-light">Ease</span><small>Campus food, made easier</small></span>
+    </a>
+    <nav id="mainNav" class="main-nav hidden" aria-label="Main navigation">
+      <button class="nav-link" data-screen="menu" onclick="showScreen('menu')">Menu</button>
+      <button class="nav-link" data-screen="cart" onclick="showScreen('cart')">Cart <span id="navCartCount" class="count">0</span></button>
+      <button class="nav-link" data-screen="tracking" onclick="showScreen('tracking')">My Orders</button>
+      <button class="nav-link admin-nav hidden" data-screen="admin" onclick="showScreen('admin')">Admin</button>
+      <button class="nav-link signout" onclick="signOut()">Sign out</button>
+    </nav>
+  </header>
+
+  <main class="page-shell">
+    <!-- SCREEN 1: LOGIN -->
+    <section id="loginScreen" class="screen login-screen active">
+      <div class="login-copy">
+        <span class="eyebrow">WELCOME TO YOUR CAMPUS CAFETERIA</span>
+        <h1>Good food.<br><span>Less waiting.</span></h1>
+        <p>Browse the menu, place an order, and follow its progress without standing in a long queue.</p>
+        <div class="login-points">
+          <span>✓ Easy ordering</span><span>✓ Clear order updates</span><span>✓ Simple checkout</span>
+        </div>
+      </div>
+      <form id="loginForm" class="panel login-card">
+        <div class="panel-heading">
+          <span class="eyebrow">GET STARTED</span>
+          <h2>Sign in to continue</h2>
+          <p>Choose a demo account type for this prototype.</p>
+        </div>
+        <label for="userName">Your name</label>
+        <input id="userName" name="userName" type="text" placeholder="e.g. Alex Santos" required maxlength="40">
+        <label for="userRole">Account type</label>
+        <select id="userRole" name="userRole">
+          <option value="customer">Customer / Student</option>
+          <option value="admin">Administrator / Staff</option>
+        </select>
+        <button class="button button-primary button-full" type="submit">Continue <span>→</span></button>
+        <p class="demo-note">Demo only: this screen does not verify real passwords or accounts.</p>
+      </form>
+    </section>
+
+    <!-- SCREEN 2: CUSTOMER MENU -->
+    <section id="menuScreen" class="screen">
+      <div class="welcome-row">
+        <div><span class="eyebrow">CAFETERIA MENU</span><h1>What are you craving?</h1><p class="muted">Choose from today's available favorites.</p></div>
+        <div class="open-pill"><span class="live-dot"></span> Sample menu</div>
+      </div>
+      <div class="menu-tools">
+        <label class="search-box"><span>⌕</span><input id="searchInput" type="search" placeholder="Search food or drinks..." aria-label="Search menu"></label>
+        <div id="categoryFilters" class="category-filters">
+          <button class="filter-chip selected" data-category="All">All</button>
+          <button class="filter-chip" data-category="Meals">Meals</button>
+          <button class="filter-chip" data-category="Snacks">Snacks</button>
+          <button class="filter-chip" data-category="Drinks">Drinks</button>
+        </div>
+      </div>
+      <div id="productGrid" class="product-grid"></div>
+    </section>
+
+    <!-- SCREEN 3: CART -->
+    <section id="cartScreen" class="screen">
+      <div class="screen-heading"><span class="eyebrow">YOUR SELECTION</span><h1>Shopping cart</h1><p class="muted">Review your items before placing your order.</p></div>
+      <div class="cart-layout">
+        <div class="panel cart-panel"><div class="panel-title"><h2>Order items</h2><span id="cartItemLabel" class="muted small">0 items</span></div><div id="cartLines"></div></div>
+        <aside class="panel summary-panel">
+          <h2>Order summary</h2>
+          <div class="summary-line"><span>Subtotal</span><strong id="cartSubtotal">₱0.00</strong></div>
+          <div class="summary-line"><span>Service fee</span><strong>₱0.00</strong></div>
+          <div class="summary-total"><span>Total</span><strong id="cartGrandTotal">₱0.00</strong></div>
+          <button id="checkoutButton" class="button button-primary button-full" onclick="goToConfirmation()">Continue to review →</button>
+          <button class="button button-quiet button-full" onclick="showScreen('menu')">← Back to menu</button>
+          <p class="demo-note">Payment is collected at the cafeteria in this prototype.</p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- SCREEN 4: ORDER REVIEW / CONFIRMATION -->
+    <section id="confirmationScreen" class="screen">
+      <div class="screen-heading"><span class="eyebrow">FINAL CHECK</span><h1>Review your order</h1><p class="muted">Make sure everything is correct before submitting.</p></div>
+      <div class="confirm-layout">
+        <div class="panel">
+          <h2>Order details</h2>
+          <div id="reviewItems" class="review-items"></div>
+          <div class="summary-total"><span>Total to pay at pickup</span><strong id="reviewTotal">₱0.00</strong></div>
+        </div>
+        <div class="panel pickup-panel">
+          <span class="step-number">1</span><h2>Pickup information</h2>
+          <label for="pickupName">Name for the order</label>
+          <input id="pickupName" type="text" maxlength="40" placeholder="Your name">
+          <label for="pickupNote">Note for cafeteria (optional)</label>
+          <textarea id="pickupNote" rows="3" maxlength="120" placeholder="e.g. No ice, please"></textarea>
+          <div class="notice">Please pay at the cafeteria counter when you collect your order.</div>
+          <button class="button button-primary button-full" onclick="placeOrder()">Confirm and place order</button>
+          <button class="button button-quiet button-full" onclick="showScreen('cart')">← Edit cart</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SCREEN 5: ORDER TRACKING -->
+    <section id="trackingScreen" class="screen">
+      <div class="screen-heading"><span class="eyebrow">ORDER ACTIVITY</span><h1>Track your orders</h1><p class="muted">Check the latest status of your cafeteria orders.</p></div>
+      <div id="customerOrderList" class="order-list"></div>
+    </section>
+
+    <!-- SCREEN 6: ADMIN DASHBOARD -->
+    <section id="adminScreen" class="screen">
+      <div class="welcome-row"><div><span class="eyebrow">STAFF WORKSPACE</span><h1>Administrator dashboard</h1><p class="muted">Review incoming orders and update their progress.</p></div><span class="admin-tag">ADMIN VIEW</span></div>
+      <div id="adminStats" class="stats-grid"></div>
+      <div class="panel admin-orders-panel"><div class="panel-title"><h2>Incoming orders</h2><span class="muted small">Newest first</span></div><div id="adminOrderList"></div></div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <footer>© 2026 CafeteriaEase · Engineering Design Activity Prototype</footer>
+  <script src="script.js"></script>
+</body>
+</html>
